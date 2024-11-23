@@ -25,11 +25,35 @@ def view_tasks():
 
 # 날짜별 할일 조회
 def view_tasks_by_date():
-    pass 
+    if not todo_list:
+        print('등록된 할 일이 없습니다.')
+        return
+
+    year = int(input('년도를 입력하세요: '))
+    month = int(input('월을 입력하세요: '))
+
+    print('=== {}년 {}월 할 일 목록 ==='.format(year, month))
+    for idx, task in enumerate(todo_list):
+        due_date = task['due_date']
+        if int(due_date.split('-')[0]) == year and int(due_date.split('-')[1]) == month:
+            task_info = (task['title'], task['due_date'], task['priority'])
+            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx, task_info[0], task_info[1], task_info[2]))
+    print("================")
 
 # 우선 순위별 할일 조회
 def view_tasks_by_priority():
-    pass
+    if not todo_list:
+        print('등록된 할 일이 없습니다.')
+        return
+
+    priority = input('우선순위를 입력하세요 (높음/중간/낮음): ')
+
+    print('=== 우선순위가 {}인 할 일 목록 ==='.format(priority))
+    for idx, task in enumerate(todo_list):
+        if task['priority'] == priority:
+            task_info = (task['title'], task['due_date'], task['priority'])
+            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx, task_info[0], task_info[1], task_info[2]))
+    print("================")
 
 def add_task():
     title = input('할 일 제목을 입력하세요: ')
@@ -59,15 +83,38 @@ def delete_task():
 
 # 할일 수정 기능
 def update_task():
-    pass
+    task_id = int(input('수정할일의 번호를 입력하세요: '))
+
+    if task_id < 0 or task_id > len(todo_list) -1:
+        print("유효하지 않는 번호입니다.")
+        return
+    
+    todo = todo_list[task_id]
+    print("제목: {}, 기한: {}, 우선순위: {}".format(todo.get('title'), todo.get('due_date'), todo.get('priority')))
+
+    title = input('할 일 제목을 입력하세요: ')
+    due_date = input('기한을 입력하세요 (예 2023-11-30): ')
+    priority = input('우선순위를 입력하세요 (높음/중간/낮음): ')
+
+    update_todo = {
+        'title': title,
+        'due_date': due_date,
+        'priority': priority
+    }
+    todo_list[task_id] = update_todo
+
+    print('업데이트하였습니다.')
     
 def main():
     while True:
         print("===== 할 일 목록 관리 =====")
         print("0. 종료")
         print("1. 할 일 추가")
-        print("2. 할 일 조회")
-        print("3. 할 일 삭제")
+        print("2. 할 일 삭제")
+        print("3. 할 일 수정")
+        print("4. 할 일 조회")
+        print("5. 날짜별 할 일 조회")
+        print("6. 우선순위별 할 일 조회")
         choice = int(input("원하는 작업을 선택하세요: "))
 
         if choice == 0:
@@ -77,9 +124,15 @@ def main():
         if choice == 1:
             add_task()
         elif choice == 2:
-            view_tasks()
-        elif choice == 3:
             delete_task()
+        elif choice == 3:
+            update_task()
+        elif choice == 4:
+            view_tasks()
+        elif choice == 5:
+            view_tasks_by_date()
+        elif choice == 6:
+            view_tasks_by_priority()
         else:
             print("올바른 번호를 입력하세요")
     # 프로그램의 맨 아래에서 main() 함수를 직접 호출합니다.
