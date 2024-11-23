@@ -20,7 +20,7 @@ def view_tasks():
     for idx, task in enumerate(todo_list):
         # 딕셔너리의 값을 튜플로 변환하여 출력
         task_info = (task['title'], task['due_date'], task['priority'])
-        print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, task_info[0], task_info[1], task_info[2]))
+        print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx, task_info[0], task_info[1], task_info[2]))
     print("================")
 
 # 날짜별 할일 조회
@@ -47,7 +47,15 @@ def add_task():
 
 # 할일 삭제 기능
 def delete_task():
-    pass
+    task_id = int(input('삭제할일의 번호를 입력하세요: '))
+
+    if task_id < 0 or task_id > len(todo_list) -1:
+        print("유효하지 않는 번호입니다.")
+        return
+
+    remove_task = todo_list.pop(task_id)
+    
+    print('할일: {} 가 삭제되었습니다.'.format(remove_task.get('title')))
 
 # 할일 수정 기능
 def update_task():
@@ -56,18 +64,22 @@ def update_task():
 def main():
     while True:
         print("===== 할 일 목록 관리 =====")
+        print("0. 종료")
         print("1. 할 일 추가")
         print("2. 할 일 조회")
-        print("3. 종료")
-        choice = input("원하는 작업을 선택하세요: ")
+        print("3. 할 일 삭제")
+        choice = int(input("원하는 작업을 선택하세요: "))
 
-        if choice == '1':
-            add_task()
-        elif choice == '2':
-            view_tasks()
-        elif choice == '3':
+        if choice == 0:
             print("프로그램을 종료합니다.")
             break
+
+        if choice == 1:
+            add_task()
+        elif choice == 2:
+            view_tasks()
+        elif choice == 3:
+            delete_task()
         else:
             print("올바른 번호를 입력하세요")
     # 프로그램의 맨 아래에서 main() 함수를 직접 호출합니다.
