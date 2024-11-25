@@ -3,6 +3,17 @@ todo_list = []
 def print_todo_details(todo_id, todo):
     print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(todo_id, todo['title'], todo['due_date'], todo['priority']))
 
+def get_todo_by_id(todo_id):
+    if not todo_list:
+        print('등록된 할 일이 없습니다.')
+        return None
+
+    if todo_id < 1 or todo_id > len(todo_list):
+        print('올바른 할 일 번호를 입력하세요.')
+        return None
+
+    return todo_list[todo_id - 1]
+
 def add_todo(title, due_date, priority):
     # 할 일 정보를 딕셔너리로 저장
     todo = {
@@ -15,12 +26,7 @@ def add_todo(title, due_date, priority):
 
 # 할일 삭제 기능
 def delete_todo(todo_id):
-    if not todo_list:
-        print('등록된 할 일이 없습니다.')
-        return
-        
-    if todo_id < 1 or todo_id > len(todo_list):
-        print('올바른 할 일 번호를 입력하세요.')
+    if not get_todo_by_id(todo_id):
         return
     
     remove_todo = todo_list.pop(todo_id - 1)
@@ -28,12 +34,7 @@ def delete_todo(todo_id):
 
 # 할일 수정 기능
 def update_todo(todo_id, title, due_date, priority):
-    if not todo_list:
-        print('등록된 할 일이 없습니다.')
-        return
-
-    if todo_id < 1 or todo_id > len(todo_list):
-        print('올바른 할 일 번호를 입력하세요.')
+    if not get_todo_by_id(todo_id):
         return
     
     todo = todo_list[todo_id - 1]
