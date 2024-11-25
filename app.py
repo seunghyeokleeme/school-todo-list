@@ -25,7 +25,24 @@ def view_tasks():
 
 # 날짜별 할일 조회
 def view_tasks_by_date():
-    pass 
+    if not todo_list:
+        print('등록된 할 일이 없습니다.')
+        return
+    
+    year = int(input('년도를 입력하세요: '))
+    month = int(input('월을 입력하세요: '))
+
+    print('=== {}년 {:02d}월 할 일 목록 ==='.format(year, month))
+    count = 0
+    for idx, task in enumerate(todo_list):
+        if task['due_date'].startswith('{}-{:02d}'.format(year, month)):
+            count += 1
+            task_info = (task['title'], task['due_date'], task['priority'])
+            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, task_info[0], task_info[1], task_info[2]))
+    
+    if count == 0:
+        print('해당 월에 등록된 할 일이 없습니다.')
+    print("================")
 
 # 우선 순위별 할일 조회
 def view_tasks_by_priority():
@@ -100,6 +117,7 @@ def main():
         print("3. 종료")
         print("4. 할 일 수정")
         print("5. 할 일 삭제")
+        print("6. 날짜별 할 일 조회")
         choice = input("원하는 작업을 선택하세요: ")
 
         if choice == '1':
@@ -113,6 +131,8 @@ def main():
             update_task()
         elif choice == '5':
             delete_task()
+        elif choice == '6':
+            view_tasks_by_date()
         else:
             print("올바른 번호를 입력하세요")
     # 프로그램의 맨 아래에서 main() 함수를 직접 호출합니다.
