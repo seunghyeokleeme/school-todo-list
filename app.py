@@ -11,20 +11,18 @@
 
 todo_list = []
 
-def view_tasks():
+def get_all_todos():
     if not todo_list:
         print('등록된 할 일이 없습니다.')
         return
     
     print('=== 할 일 목록 ===')
-    for idx, task in enumerate(todo_list):
-        # 딕셔너리의 값을 튜플로 변환하여 출력
-        task_info = (task['title'], task['due_date'], task['priority'])
-        print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, task_info[0], task_info[1], task_info[2]))
+    for idx, todo in enumerate(todo_list):
+        print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, todo['title'], todo['due_date'], todo['priority']))
     print("================")
 
 # 날짜별 할일 조회
-def view_tasks_by_date():
+def get_todos_by_date():
     if not todo_list:
         print('등록된 할 일이 없습니다.')
         return
@@ -34,52 +32,50 @@ def view_tasks_by_date():
 
     print('=== {}년 {:02d}월 할 일 목록 ==='.format(year, month))
     count = 0
-    for idx, task in enumerate(todo_list):
-        if task['due_date'].startswith('{}-{:02d}'.format(year, month)):
+    for idx, todo in enumerate(todo_list):
+        if todo['due_date'].startswith('{}-{:02d}'.format(year, month)):
             count += 1
-            task_info = (task['title'], task['due_date'], task['priority'])
-            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, task_info[0], task_info[1], task_info[2]))
+            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, todo['title'], todo['due_date'], todo['priority']))
     
     if count == 0:
         print('해당 월에 등록된 할 일이 없습니다.')
     print("================")
 
 # 우선 순위별 할일 조회
-def view_tasks_by_priority():
+def get_todos_by_priority():
     if not todo_list:
         print('등록된 할 일이 없습니다.')
         return
     
-    priority = input('우선순위를 입력하세요 (높음/중간/낮음): ')
+    priority = input('우선순위를 입력하세요 (높음, 중간, 낮음): ')
 
     print('=== 우선순위가 {}인 할 일 목록 ==='.format(priority))
     count = 0
-    for idx, task in enumerate(todo_list):
-        if task['priority'] == priority:
+    for idx, todo in enumerate(todo_list):
+        if todo['priority'] == priority:
             count += 1
-            task_info = (task['title'], task['due_date'], task['priority'])
-            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, task_info[0], task_info[1], task_info[2]))
+            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, todo['title'], todo['due_date'], todo['priority']))
     
     if count == 0:
         print('해당 우선순위에 등록된 할 일이 없습니다.')
     print("================")
 
-def add_task():
+def add_todo():
     title = input('할 일 제목을 입력하세요: ')
-    due_date = input('기한을 입력하세요 (예 2023-11-30): ')
+    due_date = input('기한을 입력하세요 (예 2023-09-03): ')
     priority = input('우선순위를 입력하세요 (높음/중간/낮음): ')
 
     # 할 일 정보를 딕셔너리로 저장
-    task = {
+    todo = {
         'title': title,
         'due_date': due_date,
         'priority': priority
     }
-    todo_list.append(task)
+    todo_list.append(todo)
     print('할 일이 추가되었습니다.')
 
 # 할일 삭제 기능
-def delete_task():
+def delete_todo():
     if not todo_list:
         print('등록된 할 일이 없습니다.')
         return
@@ -94,7 +90,7 @@ def delete_task():
     print('할일: {} 가 삭제되었습니다.'.format(remove_todo['title']))
 
 # 할일 수정 기능
-def update_task():
+def update_todo():
     if not todo_list:
         print('등록된 할 일이 없습니다.')
         return
@@ -115,44 +111,44 @@ def update_task():
     due_date = input('기한을 입력하세요 (예 2023-11-30): ')
     priority = input('우선순위를 입력하세요 (높음/중간/낮음): ')
 
-    update_todo = {
+    updated_todo = {
         'title': title,
         'due_date': due_date,
         'priority': priority
     }
 
-    todo_list[todo_id - 1] = update_todo
+    todo_list[todo_id - 1] = updated_todo
     print('할 일이 수정되었습니다.')
 
     
 def main():
     while True:
         print("===== 할 일 목록 관리 =====")
+        print("0. 종료")
         print("1. 할 일 추가")
-        print("2. 할 일 조회")
-        print("3. 종료")
-        print("4. 할 일 수정")
-        print("5. 할 일 삭제")
-        print("6. 날짜별 할 일 조회")
-        print("7. 우선순위별 할 일 조회")
+        print("2. 할 일 수정")
+        print("3. 할 일 삭제")
+        print("4. 할 일 목록 조회")
+        print("5. 날짜별 할 일 목록 조회")
+        print("6. 우선순위별 할 일 목록 조회")
         print("==========================")
-        choice = input("원하는 작업을 선택하세요: ")
+        choice = int(input("원하는 작업을 선택하세요 (예 1): "))
 
-        if choice == '1':
-            add_task()
-        elif choice == '2':
-            view_tasks()
-        elif choice == '3':
+        if choice == 0:
             print("프로그램을 종료합니다.")
             break
-        elif choice == '4':
-            update_task()
-        elif choice == '5':
-            delete_task()
-        elif choice == '6':
-            view_tasks_by_date()
-        elif choice == '7':
-            view_tasks_by_priority()
+        elif choice == 1:
+            add_todo()
+        elif choice == 2:
+            update_todo()
+        elif choice == 3:
+            delete_todo()
+        elif choice == 4:
+            get_all_todos()
+        elif choice == 5:
+            get_todos_by_date()
+        elif choice == 6:
+            get_todos_by_priority()
         else:
             print("올바른 번호를 입력하세요")
     # 프로그램의 맨 아래에서 main() 함수를 직접 호출합니다.
