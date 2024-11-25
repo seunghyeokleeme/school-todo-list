@@ -51,7 +51,35 @@ def delete_task():
 
 # 할일 수정 기능
 def update_task():
-    pass
+    if not todo_list:
+        print('등록된 할 일이 없습니다.')
+        return
+
+    todo_id = int(input('수정할 할 일의 번호를 입력하세요: '))
+
+    if todo_id < 1 or todo_id > len(todo_list):
+        print('올바른 할 일 번호를 입력하세요.')
+        return
+    
+    todo = todo_list[todo_id - 1]
+    
+    print('수정 전 할 일 정보')
+    print('제목: {}, 기한: {}, 우선순위: {}'.format(todo['title'], todo['due_date'], todo['priority']))
+    print('할 일 정보를 수정하세요.')
+
+    title = input('할 일 제목을 입력하세요: ')
+    due_date = input('기한을 입력하세요 (예 2023-11-30): ')
+    priority = input('우선순위를 입력하세요 (높음/중간/낮음): ')
+
+    update_todo = {
+        'title': title,
+        'due_date': due_date,
+        'priority': priority
+    }
+
+    todo_list[todo_id - 1] = update_todo
+    print('할 일이 수정되었습니다.')
+
     
 def main():
     while True:
@@ -59,6 +87,7 @@ def main():
         print("1. 할 일 추가")
         print("2. 할 일 조회")
         print("3. 종료")
+        print("4. 할 일 수정")
         choice = input("원하는 작업을 선택하세요: ")
 
         if choice == '1':
@@ -68,6 +97,8 @@ def main():
         elif choice == '3':
             print("프로그램을 종료합니다.")
             break
+        elif choice == '4':
+            update_task()
         else:
             print("올바른 번호를 입력하세요")
     # 프로그램의 맨 아래에서 main() 함수를 직접 호출합니다.
