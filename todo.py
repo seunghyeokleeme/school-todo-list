@@ -92,6 +92,10 @@ def get_todos_by_priority(priority):
     if not todo_list:
         print('등록된 할 일이 없습니다.')
         return
+    
+    if priority not in VALID_PRIORITIES:
+        print('올바른 우선순위를 입력하세요.')
+        return
 
     print('=== 우선순위가 {}인 할 일 목록 ==='.format(priority))
     count = 0
