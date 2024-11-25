@@ -1,5 +1,7 @@
 todo_list = []
 
+VALID_PRIORITIES = ('높음', '중간', '낮음')
+
 def print_todo_details(todo_id, todo):
     print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(todo_id, todo['title'], todo['due_date'], todo['priority']))
 
@@ -15,6 +17,10 @@ def get_todo_by_id(todo_id):
     return todo_list[todo_id - 1]
 
 def add_todo(title, due_date, priority):
+    if priority not in VALID_PRIORITIES:
+        print('올바른 우선순위를 입력하세요.')
+        return
+    
     # 할 일 정보를 딕셔너리로 저장
     todo = {
         'title': title,
@@ -37,6 +43,10 @@ def update_todo(todo_id, title, due_date, priority):
     if not get_todo_by_id(todo_id):
         return
     
+    if priority not in VALID_PRIORITIES:
+        print('올바른 우선순위를 입력하세요.')
+        return
+
     todo = todo_list[todo_id - 1]
     
     print('수정 전 할 일 정보')
