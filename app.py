@@ -47,7 +47,18 @@ def add_task():
 
 # 할일 삭제 기능
 def delete_task():
-    pass
+    if not todo_list:
+        print('등록된 할 일이 없습니다.')
+        return
+    
+    todo_id = int(input('삭제할 할 일의 번호를 입력하세요: '))
+    
+    if todo_id < 1 or todo_id > len(todo_list):
+        print('올바른 할 일 번호를 입력하세요.')
+        return
+    
+    remove_todo = todo_list.pop(todo_id - 1)
+    print('할일: {} 가 삭제되었습니다.'.format(remove_todo['title']))
 
 # 할일 수정 기능
 def update_task():
@@ -88,6 +99,7 @@ def main():
         print("2. 할 일 조회")
         print("3. 종료")
         print("4. 할 일 수정")
+        print("5. 할 일 삭제")
         choice = input("원하는 작업을 선택하세요: ")
 
         if choice == '1':
@@ -99,6 +111,8 @@ def main():
             break
         elif choice == '4':
             update_task()
+        elif choice == '5':
+            delete_task()
         else:
             print("올바른 번호를 입력하세요")
     # 프로그램의 맨 아래에서 main() 함수를 직접 호출합니다.
