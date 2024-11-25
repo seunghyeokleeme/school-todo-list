@@ -11,6 +11,9 @@
 
 todo_list = []
 
+def print_todo_details(todo_id, todo):
+    print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(todo_id, todo['title'], todo['due_date'], todo['priority']))
+
 def get_all_todos():
     if not todo_list:
         print('등록된 할 일이 없습니다.')
@@ -18,7 +21,7 @@ def get_all_todos():
     
     print('=== 할 일 목록 ===')
     for idx, todo in enumerate(todo_list):
-        print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, todo['title'], todo['due_date'], todo['priority']))
+        print_todo_details(idx+1, todo)
     print("================")
 
 # 날짜별 할일 조회
@@ -35,7 +38,7 @@ def get_todos_by_date():
     for idx, todo in enumerate(todo_list):
         if todo['due_date'].startswith('{}-{:02d}'.format(year, month)):
             count += 1
-            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, todo['title'], todo['due_date'], todo['priority']))
+            print_todo_details(idx+1, todo)
     
     if count == 0:
         print('해당 월에 등록된 할 일이 없습니다.')
@@ -54,7 +57,7 @@ def get_todos_by_priority():
     for idx, todo in enumerate(todo_list):
         if todo['priority'] == priority:
             count += 1
-            print("{}. 제목: {}, 기한: {}, 우선순위: {}".format(idx+1, todo['title'], todo['due_date'], todo['priority']))
+            print_todo_details(idx+1, todo)
     
     if count == 0:
         print('해당 우선순위에 등록된 할 일이 없습니다.')
