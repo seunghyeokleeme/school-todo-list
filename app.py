@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 TODO_DB = []
 TODO_FILE_PATH = 'todos.json'
@@ -56,7 +57,7 @@ def get_todos_by_date(target_date):
     except ValueError:
         print("올바른 날짜 형식을 입력하세요. (예: YYYY-MM-DD)")
     else:
-        filtered_todos.sort(key=lambda x: x['priority'])
+        filtered_todos.sort(key=lambda x: (x['priority'], x['created_at']))
         return filtered_todos
 
 def get_todos_by_priority(priority):
@@ -73,7 +74,7 @@ def get_todos_by_priority(priority):
     except ValueError:
         print("올바른 우선순위를 입력하세요. (높음: 0, 중간: 1, 낮음: 2)")
     else:
-        filtered_todos.sort(key=lambda x: x['due_date'])
+        filtered_todos.sort(key=lambda x: (x['due_date'], x['created_at']))
         return filtered_todos
 
 def add_todo(title, due_date, priority):
@@ -82,6 +83,7 @@ def add_todo(title, due_date, priority):
         # 할 일 정보를 딕셔너리로 저장
         todo = {
             'title': title,
+            'created_at': datetime.now().isoformat(),
             'due_date': due_date,
             'priority': priority
         }
