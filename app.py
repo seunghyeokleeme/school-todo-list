@@ -1,4 +1,5 @@
 import json
+import random
 from datetime import datetime
 
 TODO_DB = []
@@ -41,6 +42,13 @@ def validate_priority(priority):
         raise ValueError("priority 값이 올바르지 않습니다.")
     return True
 
+def validate_date(date):
+    try:
+        datetime.strptime(date, '%Y-%m-%d')
+    except ValueError:
+        raise ValueError("날짜 형식이 올바르지 않습니다. (예: YYYY-MM-DD)")
+    return True
+
 def get_all_todos():
     return TODO_DB
 
@@ -48,14 +56,15 @@ def get_todos_by_date(target_date):
     # 결과를 저장할 리스트 초기화
     filtered_todos = []
     try:
+        validate_date(target_date)
         todo_list = get_all_todos()
 
         # todo_list에서 각 항목을 확인
         for todo in todo_list:
             if todo['due_date'] == target_date:  # 날짜가 일치하면
                 filtered_todos.append(todo)  # 결과 리스트에 추가
-    except ValueError:
-        print("올바른 날짜 형식을 입력하세요. (예: YYYY-MM-DD)")
+    except ValueError as e:
+        print(e)
     else:
         filtered_todos.sort(key=lambda x: (x['priority'], x['created_at']))
         return filtered_todos
@@ -80,6 +89,7 @@ def get_todos_by_priority(priority):
 def add_todo(title, due_date, priority):
     try:
         validate_priority(priority)
+        validate_date(due_date)
         # 할 일 정보를 딕셔너리로 저장
         todo = {
             'title': title,
@@ -89,8 +99,9 @@ def add_todo(title, due_date, priority):
         }
         TODO_DB.append(todo) # 할 일 정보를 TODO_DB에 추가
         save_todo_db() # DB에 저장
-    except ValueError:
-        print("유효한 데이터를 입력하세요")
+    except ValueError as e:
+        print(e)
+        print("올바른 데이터를 입력하세요")
         return False
     else:
         print('할 일이 추가되었습니다.')
@@ -122,6 +133,7 @@ def delete_todo(id):
 def update_todo(id, update_data):
     try:
         validate_priority(update_data['priority'])
+        validate_date(update_data['due_date'])
         todo_list = get_all_todos()
         if id < 0 or id >= len(todo_list):
             raise IndexError('todo id is out of range')
@@ -132,8 +144,8 @@ def update_todo(id, update_data):
                 todo[key] = update_data[key]
         
         save_todo_db()
-    except ValueError:
-        print("우선순위 값이 올바르지 않습니다.")
+    except ValueError as e:
+        print(e)
     except IndexError:
         print("올바른 할 일 번호를 입력하세요")
     except:
@@ -208,6 +220,16 @@ def update_todo_item():
     except ValueError:
         print("올바른 데이터를 입력하세요")
 
+#랜덤모듈 활용 - 랜덤으로 할 일 추천받기
+def recommend_todo():
+    todo_list = get_all_todos()
+    if not todo_list:
+        print('등록된 할 일이 없습니다')
+        return
+    random_todo = random.choice(todo_list)
+    print("=== 추천할 일 ===")
+    print("추천할 일: {}".format(random_todo['title']))
+
 
 def display_menu():
     print("===== To-Do List APP =====")
@@ -218,6 +240,7 @@ def display_menu():
     print("4. 할 일 조회")
     print("5. 날짜별 할 일 조회")
     print("6. 우선순위별 할 일 조회")
+    print("7. 랜덤으로 할 일 추천받기")
     print("===========================")
 
 def handle_todo_action(choice):
@@ -233,6 +256,8 @@ def handle_todo_action(choice):
         search_todos_by_date()
     elif choice == '6':
         search_todos_by_priority()
+    elif choice == '7':
+        recommend_todo()
     else:
         print("올바른 메뉴 번호를 입력하세요(0-6)")
 
