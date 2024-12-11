@@ -26,6 +26,7 @@ def save_todo_db():
 def load_todo_db():
     try:
         with open(TODO_FILE_PATH, 'r', encoding='UTF-8') as file:
+            TODO_DB.clear()
             TODO_DB.extend(json.load(file))
     except FileNotFoundError:
         msgbox.showinfo("알림", "저장된 할 일이 없습니다.")
@@ -34,8 +35,6 @@ def load_todo_db():
         print("DB를 불러올 수 없습니다.", e)
     else:
         msgbox.showinfo("알림", "DB를 성공적으로 불러왔습니다.")
-    finally:
-        print("DB를 불러오는 작업이 완료되었습니다.")
 
 
 def validate_priority(priority):
@@ -47,18 +46,27 @@ def validate_date(date):
     try:
         datetime.strptime(date, '%Y-%m-%d')
     except ValueError:
-        raise ValueError("날짜 형식이 올바르지 않습니다. (예: YYYY-MM-DD)")
+        raise ValueError("날짜 형식이 올바르지 않습니다. 올바른 형식: YYYY-MM-DD (예: 2023-10-01)")
     return True
 
 def get_all_todos():
     return TODO_DB
 
 def get_todos_by_date(target_date):
+    """
+    주어진 날짜에 해당하는 할 일 목록을 반환합니다.
+
+    매개변수:
+    target_date (str): 조회할 날짜 (형식: YYYY-MM-DD)
+
+    반환값:
+    list: 주어진 날짜에 해당하는 할 일 목록
+    """
     # 결과를 저장할 리스트 초기화
     filtered_todos = []
     try:
-        validate_date(target_date)
-        todo_list = get_all_todos()
+        validate_date(target_date)  # 날짜 형식 검증
+        todo_list = get_all_todos()  # 모든 할 일 목록 가져오기
 
         # todo_list에서 각 항목을 확인
         for todo in todo_list:
@@ -67,27 +75,48 @@ def get_todos_by_date(target_date):
     except ValueError as e:
         print(e)
     else:
+        # 우선순위와 생성일을 기준으로 정렬
         filtered_todos.sort(key=lambda x: (x['priority'], x['created_at']))
         return filtered_todos
 
 def get_todos_by_priority(priority):
-    filtered_todos = []
+    """
+    주어진 우선순위에 해당하는 할 일 목록을 반환합니다.
+
+    매개변수:
+    priority (int): 조회할 우선순위 (높음: 0, 중간: 1, 낮음: 2)
+
+    반환값:
+    list: 주어진 우선순위에 해당하는 할 일 목록
+    """
     try:
         validate_priority(priority)
         
         # 결과를 저장할 리스트 초기화
         todo_list = get_all_todos()
+        filtered_todos = []
         
         for todo in todo_list:
             if todo['priority'] == priority:
                 filtered_todos.append(todo)
     except ValueError:
-        print("올바른 우선순위를 입력하세요. (높음: 0, 중간: 1, 낮음: 2)")
+        return []
     else:
         filtered_todos.sort(key=lambda x: (x['due_date'], x['created_at']))
         return filtered_todos
 
 def add_todo(title, due_date, priority):
+    """
+    할 일을 추가합니다.
+
+    매개변수:
+    title (str): 할 일 제목
+    due_date (str): 마감 날짜 (형식: YYYY-MM-DD)
+    priority (int): 우선순위 (높음: 0, 중간: 1, 낮음: 2)
+
+    반환값:
+    bool: 할 일 추가 성공 여부 (성공: True, 실패: False)
+    """
     try:
         validate_priority(priority)
         validate_date(due_date)
@@ -202,7 +231,7 @@ def create_todo_handler():
         populate_todo_treeview(todo_treeview)
 
 
-def delete_todo_item():
+def delete_todo_handler():
     try:
         # treeview에서 선택된 아이템의 정보를 가져옴
         selected_item = todo_treeview.selection()
@@ -220,7 +249,7 @@ def delete_todo_item():
         msgbox.showinfo("알림", "할 일이 삭제되었습니다.")
         populate_todo_treeview(todo_treeview)
 
-def update_todo_item():
+def update_todo_handler():
     try:
         selected_item = todo_treeview.selection()
         if not selected_item:
@@ -293,8 +322,7 @@ def backup_handler():
     else:
         msgbox.showinfo("알림", "백업이 완료되었습니다.")
 
-
-
+# GUI 코드
 window = Tk()
 window.title("To-Do List App")
 window.geometry("1024x768")
@@ -338,10 +366,10 @@ todo_priority_combobox.grid(row=2, column=1, pady=10, padx=10)
 add_todo_btn = Button(nav_frame, text="할 일 추가", command=create_todo_handler)
 add_todo_btn.grid(row=0, column=0)
 
-update_todo_btn = Button(nav_frame, text="할 일 수정", command=update_todo_item)
+update_todo_btn = Button(nav_frame, text="할 일 수정", command=update_todo_handler)
 update_todo_btn.grid(row=0, column=1)
 
-delete_todo_btn = Button(nav_frame, text="할 일 삭제", command=delete_todo_item)
+delete_todo_btn = Button(nav_frame, text="할 일 삭제", command=delete_todo_handler)
 delete_todo_btn.grid(row=0, column=2)
 
 recommend_todo_btn = Button(nav_frame, text="할 일 추천", command=recommend_todo, fg="darkgreen")
