@@ -37,6 +37,11 @@ def load_todo_db():
         msgbox.showinfo("알림", "DB를 성공적으로 불러왔습니다.")
 
 
+def validate_title(title):
+    if title == "":
+        raise ValueError("할 일 제목을 입력하세요.")
+    return True
+
 def validate_priority(priority):
     if priority not in PRIORITY_LEVELS:
         raise ValueError("priority 값이 올바르지 않습니다.")
@@ -125,6 +130,7 @@ def add_todo(title, due_date, priority):
     bool: 할 일 추가 성공 여부 (성공: True, 실패: False)
     """
     try:
+        validate_title(title)
         validate_priority(priority)
         validate_date(due_date)      
         # 할 일 정보를 딕셔너리로 저장
@@ -183,6 +189,7 @@ def compelete_todo(idx):
 # 할일 수정 기능
 def update_todo(idx, update_data):
     try:
+        validate_title(update_data['title'])
         validate_priority(update_data['priority'])
         validate_date(update_data['due_date'])
         todo_list = get_all_todos()
