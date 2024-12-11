@@ -287,35 +287,41 @@ window = Tk()
 window.title("To-Do List App")
 window.geometry("1024x768")
 
-form_frame = Frame(window, bg="lightgreen", width=200, height=200)
-form_frame.grid(row=0, column=0, rowspan=2, sticky=N+S)
+header_frame = Frame(window, height=50)
+header_frame.grid(row=0, column=0, columnspan=2, sticky=E+W)
 
-content_frame = Frame(window, bg="white")
-content_frame.grid(row=0, column=1, rowspan=2, sticky=N+S+E+W)
+form_frame = Frame(window, bg="lightgreen", width=200)
+form_frame.grid(row=1, column=0, rowspan=2, sticky=N+S)
+
+content_frame = Frame(window, bg="lightblue")
+content_frame.grid(row=1, column=1, rowspan=2, sticky=N+S+E+W)
 
 nav_frame = Frame(window, height=50)
-nav_frame.grid(row=2, column=0, columnspan=2, sticky=E+W)
+nav_frame.grid(row=3, column=0, columnspan=2, sticky=E+W)
 
-window.grid_rowconfigure(0, weight=1)
+window.grid_rowconfigure(1, weight=1)
 window.grid_columnconfigure(1, weight=1)
 
-todo_name_label = Label(form_frame, text="할 일 제목")
-todo_name_label.grid(row=0, column=0)
+title_label = Label(header_frame, text="To-Do List App", font=("Helvetica", 24))
+title_label.pack()
+
+todo_name_label = Label(form_frame, text="할 일 제목", bg="lightgreen",fg="black")
+todo_name_label.grid(row=0, column=0, pady=10)
 
 todo_name_entry = Entry(form_frame)
-todo_name_entry.grid(row=0, column=1)
+todo_name_entry.grid(row=0, column=1, pady=10)
 
-todo_due_date_label = Label(form_frame, text="기한")
-todo_due_date_label.grid(row=1, column=0)
+todo_due_date_label = Label(form_frame, text="기한", bg="lightgreen",fg="black")
+todo_due_date_label.grid(row=1, column=0, pady=10)
 
 todo_due_date_entry = Entry(form_frame)
-todo_due_date_entry.grid(row=1, column=1)
+todo_due_date_entry.grid(row=1, column=1, pady=10)
 
-todo_priority_label = Label(form_frame, text="우선순위")
-todo_priority_label.grid(row=2, column=0)
+todo_priority_label = Label(form_frame, text="우선순위", bg="lightgreen",fg="black")
+todo_priority_label.grid(row=2, column=0, pady=10)
 
 todo_priority_combobox = ttk.Combobox(form_frame, values=list(PRIORITY_LEVELS.values()))
-todo_priority_combobox.grid(row=2, column=1)
+todo_priority_combobox.grid(row=2, column=1, pady=10, padx=10)
 
 add_todo_btn = Button(nav_frame, text="할 일 추가", command=create_todo_handler)
 add_todo_btn.grid(row=0, column=0)
@@ -326,7 +332,7 @@ update_todo_btn.grid(row=0, column=1)
 delete_todo_btn = Button(nav_frame, text="할 일 삭제", command=delete_todo_item)
 delete_todo_btn.grid(row=0, column=2)
 
-recommend_todo_btn = Button(nav_frame, text="할 일 추천", command=recommend_todo)
+recommend_todo_btn = Button(nav_frame, text="할 일 추천", command=recommend_todo, fg="darkgreen")
 recommend_todo_btn.grid(row=0, column=3)
 
 delete_all_todo_btn = Button(nav_frame, text="모든 할 일 삭제", command=clear_todo_handler)
@@ -350,8 +356,8 @@ todo_treeview.heading("우선순위", text="우선순위")
 
 todo_treeview.pack(fill=BOTH, expand=True)
 
-search_option_label = Label(search_frame, text="정렬 옵션")
-search_option_label.grid(row=0, column=0)
+search_option_label = Label(search_frame, text="정렬 옵션", fg="black")
+search_option_label.grid(row=0, column=0, padx=10)
 search_option_combobox = ttk.Combobox(search_frame, values=["우선순위", "날짜"])
 search_option_combobox.grid(row=0, column=1)
 
