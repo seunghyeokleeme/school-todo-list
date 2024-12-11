@@ -1,7 +1,8 @@
 import json
 import random
-from datetime import datetime
+import turtle
 import tkinter.messagebox as msgbox
+from datetime import datetime
 from tkinter import *
 from tkinter import ttk
 
@@ -307,6 +308,34 @@ def update_todo_handler():
         msgbox.showinfo("알림", "할 일이 수정되었습니다.")
         populate_todo_treeview(todo_treeview)
 
+def show_completion_message():
+    # 추가기능: 할일을 완료했을 때 화면에 애니메이션을 통해 완료 메세지를 출력
+    try:
+        screen = turtle.Screen()
+        screen.clearscreen()
+        screen.title("할 일 완료")
+        screen.bgcolor("white")
+        screen.setup(width=600, height=600)
+
+        colors = ["red", "green", "blue", "orange"]
+        for i in range(36):
+            turtle.pencolor(colors[i % 4])
+            turtle.forward(i * 10)
+            turtle.left(93)
+            turtle.speed(0)
+        pen = turtle.Turtle()
+        pen.hideturtle()
+        pen.speed(0)
+        pen.color("green")
+        pen.penup()
+        pen.goto(0, 0)
+        pen.write("할 일 완료!", align="center", font=("Arial", 24, "bold"))
+
+        screen.mainloop()
+        window.quit()
+    except turtle.Terminator:
+        show_completion_message()
+
 def compelete_todo_handler():
     try:
         selected_item = todo_treeview.selection()
@@ -319,10 +348,11 @@ def compelete_todo_handler():
     except IndexError:
         msgbox.showwarning("경고", "올바른 할 일 번호를 입력하세요")
     except:
-        msgbox.showerror("에러", "할 일 삭제에 실패했습니다.")
+        msgbox.showerror("에러", "할 일 완료에 실패했습니다.")
     else:
         msgbox.showinfo("알림", "{}번 할 일이 완료되었습니다.".format(todo_id))
         populate_todo_treeview(todo_treeview)
+        show_completion_message()
 
 def clear_todo_handler():
     try:
