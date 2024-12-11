@@ -102,7 +102,7 @@ def get_todos_by_priority(priority):
     except ValueError:
         return []
     else:
-        filtered_todos.sort(key=lambda x: (x['due_date'], x['created_at']))
+        filtered_todos.sort(key=lambda x: (x['status'], x['due_date'], x['created_at']))
         return filtered_todos
 
 def check_duplicate_todo(title, due_date):
@@ -133,7 +133,8 @@ def add_todo(title, due_date, priority):
             'title': title,
             'created_at': datetime.now().isoformat(),
             'due_date': due_date,
-            'priority': priority
+            'priority': priority,
+            'status': False
         }   
         
         check_duplicate_todo(title, due_date)               
@@ -167,6 +168,15 @@ def delete_todo(idx):
     if idx < 0 or idx >= len(todo_list):
         raise IndexError('todo id is out of range')
     TODO_DB.pop(idx)
+    save_todo_db()
+    return True
+
+# 할일 완료 기능
+def compelete_todo(idx):
+    todo_list = get_all_todos()
+    if idx < 0 or idx >= len(todo_list):
+        raise IndexError('todo id is out of range')
+    todo_list[idx]['status'] = True
     save_todo_db()
     return True
 
@@ -211,15 +221,15 @@ def sorting_todos_by_priority(priority=None, order='asc'):
         for todo in get_all_todos():
             sorted_todos.append(todo)
         if order == 'desc':
-            sorted_todos.sort(key=lambda x: (-x['priority'], x['due_date'], x['created_at']))
+            sorted_todos.sort(key=lambda x: (-x['priority'], x['status'], x['due_date'], x['created_at']))
         else:
-            sorted_todos.sort(key=lambda x: (x['priority'], x['due_date'], x['created_at']))
+            sorted_todos.sort(key=lambda x: (x['priority'], x['status'], x['due_date'], x['created_at']))
         
 
     todo_treeview.delete(*todo_treeview.get_children())
     for _, todo in enumerate(sorted_todos):
         priority_value = PRIORITY_LEVELS[todo['priority']]
-        todo_treeview.insert('', 'end', values=(todo['id'], todo['title'], todo['due_date'], priority_value))
+        todo_treeview.insert('', 'end', values=(todo['id'], todo['title'], todo['due_date'], priority_value, "완료" if todo['status'] else "미완료"))
 
 
 def sorting_todos_by_date(order='asc'):
@@ -227,14 +237,14 @@ def sorting_todos_by_date(order='asc'):
     for todo in get_all_todos():
         sorted_todos.append(todo)
     if order == 'desc':
-        sorted_todos.sort(key=lambda x: (datetime.strptime(x['due_date'], '%Y-%m-%d'), -x['priority'], x['created_at']), reverse=True)
+        sorted_todos.sort(key=lambda x: (datetime.strptime(x['due_date'], '%Y-%m-%d'), -x['status'], -x['priority'], x['created_at']), reverse=True)
     else:
-        sorted_todos.sort(key=lambda x: (x['due_date'], x['priority'], x['created_at']))
+        sorted_todos.sort(key=lambda x: (x['due_date'], x['status'], x['priority'], x['created_at']))
 
     todo_treeview.delete(*todo_treeview.get_children())
     for _, todo in enumerate(sorted_todos):
         priority_value = PRIORITY_LEVELS[todo['priority']]
-        todo_treeview.insert('', 'end', values=(todo['id'], todo['title'], todo['due_date'], priority_value))
+        todo_treeview.insert('', 'end', values=(todo['id'], todo['title'], todo['due_date'], priority_value, "완료" if todo['status'] else "미완료"))
 
 def create_todo_handler():
     try:
@@ -290,6 +300,23 @@ def update_todo_handler():
         msgbox.showinfo("알림", "할 일이 수정되었습니다.")
         populate_todo_treeview(todo_treeview)
 
+def compelete_todo_handler():
+    try:
+        selected_item = todo_treeview.selection()
+        if not selected_item:
+            msgbox.showwarning("경고", "완료할 할 일을 선택하세요.")
+            return
+        todo_id = int(todo_treeview.item(selected_item, "values")[0])
+        idx = get_todo_index(todo_id)
+        compelete_todo(idx)
+    except IndexError:
+        msgbox.showwarning("경고", "올바른 할 일 번호를 입력하세요")
+    except:
+        msgbox.showerror("에러", "할 일 삭제에 실패했습니다.")
+    else:
+        msgbox.showinfo("알림", "{}번 할 일이 완료되었습니다.".format(todo_id))
+        populate_todo_treeview(todo_treeview)
+
 def clear_todo_handler():
     try:
         TODO_DB.clear()
@@ -313,7 +340,7 @@ def populate_todo_treeview(treeview):
     treeview.delete(*treeview.get_children())
     for _, todo in enumerate(TODO_DB):
         priority_value = PRIORITY_LEVELS[todo['priority']]
-        treeview.insert('', 'end', values=(todo['id'], todo['title'], todo['due_date'], priority_value))
+        treeview.insert('', 'end', values=(todo['id'], todo['title'], todo['due_date'], priority_value, "완료" if todo['status'] else "미완료"))
 
 
 def on_treeview_click(event):
@@ -344,7 +371,7 @@ def backup_handler():
 # GUI 코드
 window = Tk()
 window.title("To-Do List App")
-window.geometry("1024x768")
+window.geometry("1300x768")
 
 header_frame = Frame(window, height=50)
 header_frame.grid(row=0, column=0, columnspan=2, sticky=E+W)
@@ -391,27 +418,31 @@ update_todo_btn.grid(row=0, column=1)
 delete_todo_btn = Button(nav_frame, text="할 일 삭제", command=delete_todo_handler)
 delete_todo_btn.grid(row=0, column=2)
 
+compelete_todo_btn = Button(nav_frame, text="할 일 완료", command=compelete_todo_handler)
+compelete_todo_btn.grid(row=0, column=3)
+
 recommend_todo_btn = Button(nav_frame, text="할 일 추천", command=recommend_todo, fg="darkgreen")
-recommend_todo_btn.grid(row=0, column=3)
+recommend_todo_btn.grid(row=0, column=4)
 
 delete_all_todo_btn = Button(nav_frame, text="모든 할 일 삭제", command=clear_todo_handler)
-delete_all_todo_btn.grid(row=0, column=4)
+delete_all_todo_btn.grid(row=0, column=5)
 
 exit_btn = Button(nav_frame, text="종료", command=window.quit)
-exit_btn.grid(row=0, column=5)
+exit_btn.grid(row=0, column=6)
 
 backup_btn = Button(nav_frame, text="백업", command=backup_handler)
-backup_btn.grid(row=0, column=6)
+backup_btn.grid(row=0, column=7)
 
 search_frame = Frame(content_frame)
 search_frame.pack()
 
-columns = ("ID", "제목", "기한", "우선순위")
+columns = ("ID", "제목", "기한", "우선순위", "상태")
 todo_treeview = ttk.Treeview(content_frame, columns=columns, show="headings")
 todo_treeview.heading("ID", text="ID")
 todo_treeview.heading("제목", text="제목")
 todo_treeview.heading("기한", text="기한")
 todo_treeview.heading("우선순위", text="우선순위")
+todo_treeview.heading("상태", text="상태")
 
 todo_treeview.pack(fill=BOTH, expand=True)
 
