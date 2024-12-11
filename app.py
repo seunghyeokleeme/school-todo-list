@@ -105,6 +105,13 @@ def get_todos_by_priority(priority):
         filtered_todos.sort(key=lambda x: (x['due_date'], x['created_at']))
         return filtered_todos
 
+def check_duplicate_todo(title, due_date):
+    #  추가기능: 할일을 추가했을 때 이미 같은 제목의 할일이 존재하면 에러메세지를 출력
+    for todo in TODO_DB:
+        if todo['due_date'] == due_date and todo['title'] == title:
+            raise ValueError("이미 같은 제목의 할 일이 존재합니다.")
+    return False
+
 def add_todo(title, due_date, priority):
     """
     할 일을 추가합니다.
@@ -119,7 +126,7 @@ def add_todo(title, due_date, priority):
     """
     try:
         validate_priority(priority)
-        validate_date(due_date)
+        validate_date(due_date)      
         # 할 일 정보를 딕셔너리로 저장
         todo = {
             'id': int(datetime.now().timestamp()),
@@ -127,7 +134,9 @@ def add_todo(title, due_date, priority):
             'created_at': datetime.now().isoformat(),
             'due_date': due_date,
             'priority': priority
-        }
+        }   
+        
+        check_duplicate_todo(title, due_date)               
         TODO_DB.append(todo) # 할 일 정보를 TODO_DB에 추가
         save_todo_db() # DB에 저장
     except ValueError as e:
@@ -169,7 +178,17 @@ def update_todo(idx, update_data):
         todo_list = get_all_todos()
         if idx < 0 or idx >= len(todo_list):
             raise IndexError('todo id is out of range')
+        
         todo = todo_list[idx]
+
+        # priority만 수정할 경우 중복 체크
+        if todo['title'] == update_data['title'] and todo['due_date'] == update_data['due_date']:
+            todo['priority'] = update_data['priority']
+            save_todo_db()
+            return True
+        
+        # title, due_date 모두 수정할 경우 중복 체크
+        check_duplicate_todo(update_data['title'], update_data['due_date']) 
         
         for key in todo.keys():
             if key in update_data:
