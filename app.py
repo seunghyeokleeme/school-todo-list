@@ -153,11 +153,20 @@ def update_todo(idx, update_data):
         return True
 
 
-def sorting_todos_by_priority():
+def sorting_todos_by_priority(priority=None, order='asc'):
     sorted_todos = []
-    for priority in range(3):
+
+    if priority is not None:
         todos = get_todos_by_priority(priority)
         sorted_todos.extend(todos)
+    else:
+        for todo in get_all_todos():
+            sorted_todos.append(todo)
+        if order == 'desc':
+            sorted_todos.sort(key=lambda x: (-x['priority'], x['due_date'], x['created_at']))
+        else:
+            sorted_todos.sort(key=lambda x: (x['priority'], x['due_date'], x['created_at']))
+        
 
     todo_treeview.delete(*todo_treeview.get_children())
     for _, todo in enumerate(sorted_todos):
@@ -165,11 +174,14 @@ def sorting_todos_by_priority():
         todo_treeview.insert('', 'end', values=(todo['id'], todo['title'], todo['due_date'], priority_value))
 
 
-def sorting_todos_by_date():
+def sorting_todos_by_date(order='asc'):
     sorted_todos = []
     for todo in get_all_todos():
         sorted_todos.append(todo)
-    sorted_todos.sort(key=lambda x: (x['due_date'], x['created_at']))
+    if order == 'desc':
+        sorted_todos.sort(key=lambda x: (datetime.strptime(x['due_date'], '%Y-%m-%d'), -x['priority'], x['created_at']), reverse=True)
+    else:
+        sorted_todos.sort(key=lambda x: (x['due_date'], x['priority'], x['created_at']))
 
     todo_treeview.delete(*todo_treeview.get_children())
     for _, todo in enumerate(sorted_todos):
@@ -356,15 +368,32 @@ todo_treeview.heading("우선순위", text="우선순위")
 
 todo_treeview.pack(fill=BOTH, expand=True)
 
+def load_todos_based_on_sorting():
+    if search_option_combobox.get() == "우선순위 높은순":
+        sorting_todos_by_priority()
+    elif search_option_combobox.get() == "우선순위 낮은순":
+        sorting_todos_by_priority(order='desc')
+    elif search_option_combobox.get() == "높음":
+        sorting_todos_by_priority(priority=0)
+    elif search_option_combobox.get() == "중간":
+        sorting_todos_by_priority(priority=1)
+    elif search_option_combobox.get() == "낮음":
+        sorting_todos_by_priority(priority=2)
+    elif search_option_combobox.get() == "마감기한 오름차순":
+        sorting_todos_by_date()
+    elif search_option_combobox.get() == "마감 기한 내림차순":
+        sorting_todos_by_date(order='desc')
+    else:
+        populate_todo_treeview(todo_treeview)
+
 search_option_label = Label(search_frame, text="정렬 옵션", fg="black")
 search_option_label.grid(row=0, column=0, padx=10)
-search_option_combobox = ttk.Combobox(search_frame, values=["우선순위", "날짜"])
-search_option_combobox.grid(row=0, column=1)
+search_option_combobox = ttk.Combobox(search_frame, values=["우선순위 높은순", "우선순위 낮은순", "높음", "중간", "낮음", "마감기한 오름차순", "마감 기한 내림차순"], width=10)
+search_option_combobox.grid(row=0, column=1, padx=[0, 200])
 
-def load_todos_based_on_sorting():
-    return sorting_todos_by_priority() if search_option_combobox.get() == "우선순위" else sorting_todos_by_date()
+search_option_combobox.bind("<<ComboboxSelected>>", lambda event: load_todos_based_on_sorting())
 
-search_btn = Button(search_frame, text="검색", command=lambda: load_todos_based_on_sorting())
+search_btn = Button(search_frame, text="검색", command=None)
 search_btn.grid(row=0, column=2)
 
 seacrh_all_btn = Button(search_frame, text="전체 할 일 조회", command=lambda: populate_todo_treeview(todo_treeview))
